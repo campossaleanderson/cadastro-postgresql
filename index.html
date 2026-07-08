@@ -2,31 +2,229 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>DataCad - Sistema de cadastro</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { background: #f0f2f5; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h1 { text-align: center; margin-bottom: 10px; color: #333; }
-        .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
-        .form { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 10px; margin-bottom: 30px; }
-        .form input, .form select { padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
-        .form button { padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        .form button:hover { background: #45a049; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background: #f8f9fa; }
-        .actions { display: flex; gap: 5px; }
-        .edit { background: #ffc107; color: black; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; }
-        .delete { background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; }
-        .empty { text-align: center; color: #999; padding: 20px; }
-        .status-badge { padding: 3px 10px; border-radius: 12px; font-size: 12px; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: Arial, sans-serif; 
+        }
+        
+        body { 
+            background: #f0f2f5; 
+            padding: 10px; 
+        }
+        
+        .container { 
+            max-width: 900px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 15px; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        
+        h1 { 
+            text-align: center; 
+            margin-bottom: 5px; 
+            color: #333; 
+            font-size: 24px; 
+        }
+        
+        .subtitle { 
+            text-align: center; 
+            color: #666; 
+            margin-bottom: 20px; 
+            font-size: 14px; 
+        }
+        
+        /* FORMULÁRIO - Responsivo */
+        .form { 
+            display: grid; 
+            grid-template-columns: 1fr; 
+            gap: 10px; 
+            margin-bottom: 20px; 
+        }
+        
+        .form input, 
+        .form select { 
+            padding: 12px; 
+            border: 1px solid #ddd; 
+            border-radius: 5px; 
+            font-size: 16px; 
+            width: 100%; 
+        }
+        
+        .form button { 
+            padding: 12px; 
+            background: #4CAF50; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: bold; 
+            width: 100%; 
+        }
+        
+        .form button:hover { 
+            background: #45a049; 
+        }
+        
+        /* TABELA - Responsiva */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-bottom: 15px;
+        }
+        
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            min-width: 400px;
+            font-size: 14px;
+        }
+        
+        th, td { 
+            padding: 10px 8px; 
+            text-align: left; 
+            border-bottom: 1px solid #ddd; 
+        }
+        
+        th { 
+            background: #f8f9fa; 
+            font-weight: bold;
+        }
+        
+        .actions { 
+            display: flex; 
+            gap: 5px; 
+            flex-wrap: wrap;
+        }
+        
+        .edit { 
+            background: #ffc107; 
+            color: black; 
+            border: none; 
+            padding: 5px 12px; 
+            border-radius: 3px; 
+            cursor: pointer; 
+            font-size: 14px;
+        }
+        
+        .delete { 
+            background: #dc3545; 
+            color: white; 
+            border: none; 
+            padding: 5px 12px; 
+            border-radius: 3px; 
+            cursor: pointer; 
+            font-size: 14px;
+        }
+        
+        .empty { 
+            text-align: center; 
+            color: #999; 
+            padding: 20px; 
+        }
+        
+        .status-badge { 
+            padding: 3px 10px; 
+            border-radius: 12px; 
+            font-size: 12px; 
+            display: inline-block;
+            white-space: nowrap;
+        }
+        
         .status-Ativo { background: #d4edda; color: #155724; }
         .status-Inativo { background: #f8d7da; color: #721c24; }
         .status-Pendente { background: #fff3cd; color: #856404; }
-        .stats { margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #666; font-size: 14px; }
-        .error { color: #dc3545; padding: 10px; text-align: center; }
+        
+        .stats { 
+            margin-top: 15px; 
+            padding-top: 15px; 
+            border-top: 1px solid #eee; 
+            text-align: center; 
+            color: #666; 
+            font-size: 12px; 
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .error { 
+            color: #dc3545; 
+            padding: 10px; 
+            text-align: center; 
+        }
+        
+        #mensagem {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            display: none;
+            font-size: 14px;
+        }
+        
+        /* RESPONSIVO - TELAS PEQUENAS */
+        @media (max-width: 600px) {
+            body { padding: 5px; }
+            .container { padding: 10px; }
+            h1 { font-size: 20px; }
+            
+            .form input, 
+            .form select, 
+            .form button { 
+                font-size: 16px; 
+                padding: 14px; 
+            }
+            
+            table { 
+                font-size: 13px; 
+                min-width: 350px;
+            }
+            
+            th, td { 
+                padding: 8px 6px; 
+            }
+            
+            .actions { 
+                flex-direction: column; 
+                gap: 4px;
+            }
+            
+            .edit, .delete { 
+                padding: 4px 10px; 
+                font-size: 12px; 
+                width: 100%;
+                text-align: center;
+            }
+            
+            .stats { 
+                font-size: 11px; 
+                flex-direction: column;
+                gap: 4px;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            table { 
+                font-size: 12px; 
+                min-width: 300px;
+            }
+            
+            th, td { 
+                padding: 6px 4px; 
+            }
+            
+            .status-badge { 
+                font-size: 10px; 
+                padding: 2px 8px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -46,26 +244,28 @@
             <button onclick="salvarUsuario()">Cadastrar</button>
         </div>
 
-        <div id="mensagem" style="display:none; padding:10px; margin-bottom:10px; border-radius:5px;"></div>
+        <div id="mensagem"></div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>E-mail</th>
-                    <th>Status</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody id="listaUsuarios">
-                <tr><td colspan="4" class="empty">Carregando...</td></tr>
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="listaUsuarios">
+                    <tr><td colspan="4" class="empty">Carregando...</td></tr>
+                </tbody>
+            </table>
+        </div>
 
         <div class="stats">
             <span>Dados em PostgreSQL · <span id="totalRegistros">0</span> registros</span>
-            <span style="margin-left:20px;">atualização automática</span>
-            <span style="margin-left:20px;">dados persistidos</span>
+            <span>atualização automática</span>
+            <span>dados persistidos</span>
         </div>
     </div>
 
@@ -94,15 +294,17 @@
                         <td><strong>${u.nome}</strong></td>
                         <td>${u.email}</td>
                         <td><span class="status-badge status-${u.status}">${u.status}</span></td>
-                        <td class="actions">
-                            <button class="edit" onclick="editarUsuario(${u.id})">✏️</button>
-                            <button class="delete" onclick="deletarUsuario(${u.id})">🗑️</button>
+                        <td>
+                            <div class="actions">
+                                <button class="edit" onclick="editarUsuario(${u.id})">✏️</button>
+                                <button class="delete" onclick="deletarUsuario(${u.id})">🗑️</button>
+                            </div>
                         </td>
                     </tr>
                 `).join('');
             } catch (error) {
                 console.error('Erro ao carregar usuários:', error);
-                document.getElementById('listaUsuarios').innerHTML = '<tr><td colspan="4" class="error">❌ Erro ao carregar usuários. Verifique se o servidor está rodando.</td></tr>';
+                document.getElementById('listaUsuarios').innerHTML = '<tr><td colspan="4" class="error">❌ Erro ao carregar usuários</td></tr>';
             }
         }
 
@@ -141,7 +343,8 @@
                     document.getElementById('telefone').value = '';
                     document.getElementById('status').value = 'Ativo';
                     editandoId = null;
-                    mostrarMensagem(editandoId ? 'Usuário atualizado com sucesso!' : 'Usuário cadastrado com sucesso!', 'success');
+                    document.querySelector('.form button').textContent = 'Cadastrar';
+                    mostrarMensagem(editandoId ? 'Atualizado!' : 'Cadastrado com sucesso!', 'success');
                     carregarUsuarios();
                 } else {
                     const error = await response.json();
@@ -149,7 +352,7 @@
                 }
             } catch (error) {
                 console.error('Erro:', error);
-                mostrarMensagem('Erro ao salvar usuário', 'error');
+                mostrarMensagem('Erro ao salvar', 'error');
             }
         }
 
@@ -170,24 +373,24 @@
                 }
             } catch (error) {
                 console.error('Erro:', error);
-                mostrarMensagem('Erro ao carregar dados para edição', 'error');
+                mostrarMensagem('Erro ao editar', 'error');
             }
         }
 
         async function deletarUsuario(id) {
-            if (!confirm('Tem certeza que deseja deletar este usuário?')) return;
+            if (!confirm('Tem certeza?')) return;
 
             try {
                 const response = await fetch(`/api/usuarios/${id}`, { method: 'DELETE' });
                 if (response.ok) {
-                    mostrarMensagem('Usuário deletado com sucesso!', 'success');
+                    mostrarMensagem('Deletado!', 'success');
                     carregarUsuarios();
                 } else {
-                    mostrarMensagem('Erro ao deletar usuário', 'error');
+                    mostrarMensagem('Erro ao deletar', 'error');
                 }
             } catch (error) {
                 console.error('Erro:', error);
-                mostrarMensagem('Erro ao deletar usuário', 'error');
+                mostrarMensagem('Erro ao deletar', 'error');
             }
         }
 
@@ -200,7 +403,6 @@
             setTimeout(() => { div.style.display = 'none'; }, 4000);
         }
 
-        // Carregar usuários ao iniciar
         carregarUsuarios();
     </script>
 </body>
