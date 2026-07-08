@@ -16,6 +16,9 @@ const pool = new Pool({
   database: process.env.DB_DATABASE,
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT,
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
 pool.connect((err, client, release) => {
@@ -84,16 +87,14 @@ app.delete('/api/usuarios/:id', async (req, res) => {
   }
 });
 
-// =====================================================
-// ROTA PARA SERVIR O INDEX.HTML (ADICIONADO)
-// =====================================================
+// ROTA PARA SERVIR O INDEX.HTML
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// SERVIR ARQUIVOS ESTÁTICOS (CSS, JS, imagens)
+// SERVIR ARQUIVOS ESTÁTICOS
 app.use(express.static(__dirname));
 
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
   console.log(`🚀 Servidor em http://localhost:${port}`);
 });
