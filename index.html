@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <!-- FORÇAR SEMPRE CARREGAR A VERSÃO MAIS RECENTE -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>DataCad - Sistema de cadastro</title>
     <style>
         * { 
@@ -73,6 +77,14 @@
             background: #45a049; 
         }
         
+        .form button.btn-atualizar {
+            background: #17a2b8;
+        }
+        
+        .form button.btn-atualizar:hover {
+            background: #138496;
+        }
+        
         /* TABELA - Responsiva */
         .table-responsive {
             overflow-x: auto;
@@ -124,6 +136,9 @@
             font-size: 14px;
         }
         
+        .edit:hover { background: #e0a800; }
+        .delete:hover { background: #c82333; }
+        
         .empty { 
             text-align: center; 
             color: #999; 
@@ -167,6 +182,26 @@
             border-radius: 5px;
             display: none;
             font-size: 14px;
+        }
+        
+        .btn-recarregar {
+            display: inline-block;
+            padding: 8px 20px;
+            background: #17a2b8;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .btn-recarregar:hover {
+            background: #138496;
+        }
+        
+        .text-center {
+            text-align: center;
         }
         
         /* RESPONSIVO - TELAS PEQUENAS */
@@ -241,10 +276,14 @@
                 <option value="Inativo">Inativo</option>
                 <option value="Pendente">Pendente</option>
             </select>
-            <button onclick="salvarUsuario()">Cadastrar</button>
+            <button id="btnSalvar" onclick="salvarUsuario()">Cadastrar</button>
         </div>
 
         <div id="mensagem"></div>
+
+        <div class="text-center">
+            <button class="btn-recarregar" onclick="carregarUsuarios()">🔄 Atualizar lista</button>
+        </div>
 
         <div class="table-responsive">
             <table>
@@ -270,15 +309,26 @@
     </div>
 
     <script>
+        // VERSÃO DO SISTEMA - MUDE QUANDO ALTERAR O CÓDIGO
+        const VERSAO = '1.0.3';
+        console.log('📌 DataCad Versão:', VERSAO);
+        console.log('🔄 Carregando dados...');
+
         let editandoId = null;
 
+        // FUNÇÃO PRINCIPAL: CARREGAR USUÁRIOS
         async function carregarUsuarios() {
+            console.log('🔄 Buscando usuários...');
             try {
-                const response = await fetch('/api/usuarios');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                const resposta = await fetch('/api/usuarios');
+                
+                if (!resposta.ok) {
+                    throw new Error(`Erro HTTP! status: ${resposta.status}`);
                 }
-                const usuarios = await response.json();
+                
+                const usuarios = await resposta.json();
+                console.log('📥 Usuários carregados:', usuarios.length);
+                
                 const tbody = document.getElementById('listaUsuarios');
                 const total = document.getElementById('totalRegistros');
                 
@@ -291,8 +341,8 @@
 
                 tbody.innerHTML = usuarios.map(u => `
                     <tr>
-                        <td><strong>${u.nome}</strong></td>
-                        <td>${u.email}</td>
+                        <td><strong>${escapeHtml(u.nome)}</strong></td>
+                        <td>${escapeHtml(u.email)}</td>
                         <td><span class="status-badge status-${u.status}">${u.status}</span></td>
                         <td>
                             <div class="actions">
@@ -302,12 +352,15 @@
                         </td>
                     </tr>
                 `).join('');
-            } catch (error) {
-                console.error('Erro ao carregar usuários:', error);
-                document.getElementById('listaUsuarios').innerHTML = '<tr><td colspan="4" class="error">❌ Erro ao carregar usuários</td></tr>';
+                
+                console.log('✅ Lista atualizada com sucesso!');
+            } catch (erro) {
+                console.error('❌ Erro ao carregar usuários:', erro);
+                document.getElementById('listaUsuarios').innerHTML = '<tr><td colspan="4" class="error">❌ Erro ao carregar usuários. Verifique sua conexão.</td></tr>';
             }
         }
 
+        // FUNÇÃO PARA SALVAR (CADASTRAR OU ATUALIZAR)
         async function salvarUsuario() {
             const nome = document.getElementById('nome').value.trim();
             const email = document.getElementById('email').value.trim();
@@ -315,51 +368,79 @@
             const status = document.getElementById('status').value;
 
             if (!nome || !email) {
-                mostrarMensagem('Nome e email são obrigatórios!', 'error');
+                mostrarMensagem('⚠️ Nome e email são obrigatórios!', 'error');
                 return;
             }
 
-            const usuario = { nome, email, telefone: telefone || null, status };
+            const usuario = { 
+                nome, 
+                email, 
+                telefone: telefone || null, 
+                status 
+            };
+
+            console.log('💾 Salvando usuário:', usuario);
+
+            const btn = document.getElementById('btnSalvar');
+            btn.textContent = 'Salvando...';
+            btn.disabled = true;
 
             try {
-                let response;
+                let resposta;
                 if (editandoId) {
-                    response = await fetch(`/api/usuarios/${editandoId}`, {
+                    resposta = await fetch(`/api/usuarios/${editandoId}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(usuario)
                     });
                 } else {
-                    response = await fetch('/api/usuarios', {
+                    resposta = await fetch('/api/usuarios', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(usuario)
                     });
                 }
 
-                if (response.ok) {
+                if (resposta.ok) {
+                    // Limpar campos
                     document.getElementById('nome').value = '';
                     document.getElementById('email').value = '';
                     document.getElementById('telefone').value = '';
                     document.getElementById('status').value = 'Ativo';
+                    
+                    const mensagem = editandoId ? '✅ Usuário atualizado com sucesso!' : '✅ Usuário cadastrado com sucesso!';
+                    mostrarMensagem(mensagem, 'success');
+                    
                     editandoId = null;
-                    document.querySelector('.form button').textContent = 'Cadastrar';
-                    mostrarMensagem(editandoId ? 'Atualizado!' : 'Cadastrado com sucesso!', 'success');
-                    carregarUsuarios();
+                    document.getElementById('btnSalvar').textContent = 'Cadastrar';
+                    
+                    // 🔥 RECARREGAR A LISTA IMEDIATAMENTE
+                    await carregarUsuarios();
+                    
+                    // 👇 FORÇAR ATUALIZAÇÃO NO MOBILE (recarrega a página)
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 500);
+                    
                 } else {
-                    const error = await response.json();
-                    mostrarMensagem('Erro: ' + (error.error || 'Erro ao salvar'), 'error');
+                    const erro = await resposta.json();
+                    mostrarMensagem('❌ Erro: ' + (erro.error || 'Erro ao salvar'), 'error');
                 }
-            } catch (error) {
-                console.error('Erro:', error);
-                mostrarMensagem('Erro ao salvar', 'error');
+            } catch (erro) {
+                console.error('❌ Erro na requisição:', erro);
+                mostrarMensagem('❌ Erro ao salvar usuário. Verifique sua conexão.', 'error');
+            } finally {
+                btn.textContent = editandoId ? 'Atualizar' : 'Cadastrar';
+                btn.disabled = false;
             }
         }
 
+        // FUNÇÃO PARA EDITAR
         async function editarUsuario(id) {
+            console.log('✏️ Editando usuário ID:', id);
             try {
-                const response = await fetch('/api/usuarios');
-                const usuarios = await response.json();
+                const resposta = await fetch('/api/usuarios');
+                const usuarios = await resposta.json();
                 const usuario = usuarios.find(u => u.id === id);
                 
                 if (usuario) {
@@ -368,42 +449,90 @@
                     document.getElementById('telefone').value = usuario.telefone || '';
                     document.getElementById('status').value = usuario.status || 'Ativo';
                     editandoId = id;
-                    document.querySelector('.form button').textContent = 'Atualizar';
-                    mostrarMensagem('Editando: ' + usuario.nome, 'info');
+                    document.getElementById('btnSalvar').textContent = 'Atualizar';
+                    mostrarMensagem('✏️ Editando: ' + usuario.nome, 'info');
+                    // Rolar para o topo
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
-            } catch (error) {
-                console.error('Erro:', error);
-                mostrarMensagem('Erro ao editar', 'error');
+            } catch (erro) {
+                console.error('❌ Erro ao editar:', erro);
+                mostrarMensagem('❌ Erro ao carregar dados para edição', 'error');
             }
         }
 
+        // FUNÇÃO PARA DELETAR
         async function deletarUsuario(id) {
-            if (!confirm('Tem certeza?')) return;
+            if (!confirm('🗑️ Tem certeza que deseja deletar este usuário?')) return;
 
+            console.log('🗑️ Deletando usuário ID:', id);
             try {
-                const response = await fetch(`/api/usuarios/${id}`, { method: 'DELETE' });
-                if (response.ok) {
-                    mostrarMensagem('Deletado!', 'success');
-                    carregarUsuarios();
+                const resposta = await fetch(`/api/usuarios/${id}`, { 
+                    method: 'DELETE' 
+                });
+                
+                if (resposta.ok) {
+                    mostrarMensagem('✅ Usuário deletado com sucesso!', 'success');
+                    await carregarUsuarios();
+                    // Forçar atualização no mobile
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 300);
                 } else {
-                    mostrarMensagem('Erro ao deletar', 'error');
+                    mostrarMensagem('❌ Erro ao deletar usuário', 'error');
                 }
-            } catch (error) {
-                console.error('Erro:', error);
-                mostrarMensagem('Erro ao deletar', 'error');
+            } catch (erro) {
+                console.error('❌ Erro ao deletar:', erro);
+                mostrarMensagem('❌ Erro ao deletar usuário', 'error');
             }
         }
 
+        // FUNÇÃO PARA MOSTRAR MENSAGENS
         function mostrarMensagem(texto, tipo) {
             const div = document.getElementById('mensagem');
             div.textContent = texto;
             div.style.display = 'block';
-            div.style.background = tipo === 'error' ? '#f8d7da' : tipo === 'success' ? '#d4edda' : '#fff3cd';
-            div.style.color = tipo === 'error' ? '#721c24' : tipo === 'success' ? '#155724' : '#856404';
-            setTimeout(() => { div.style.display = 'none'; }, 4000);
+            
+            const cores = {
+                'error': { bg: '#f8d7da', color: '#721c24' },
+                'success': { bg: '#d4edda', color: '#155724' },
+                'info': { bg: '#fff3cd', color: '#856404' }
+            };
+            
+            const cor = cores[tipo] || cores['info'];
+            div.style.background = cor.bg;
+            div.style.color = cor.color;
+            
+            // Esconder após 5 segundos
+            clearTimeout(window.timerMensagem);
+            window.timerMensagem = setTimeout(() => {
+                div.style.display = 'none';
+            }, 5000);
         }
 
-        carregarUsuarios();
+        // FUNÇÃO PARA ESCAPAR HTML (evitar injeção)
+        function escapeHtml(texto) {
+            if (!texto) return '';
+            const mapa = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return texto.replace(/[&<>"']/g, function(m) { return mapa[m]; });
+        }
+
+        // CARREGAR USUÁRIOS AO INICIAR
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📱 Aplicação iniciada!');
+            carregarUsuarios();
+            
+            // Recarregar a cada 30 segundos (para manter atualizado)
+            setInterval(() => {
+                console.log('🔄 Auto-refresh...');
+                carregarUsuarios();
+            }, 30000);
+        });
     </script>
 </body>
 </html>
