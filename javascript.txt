@@ -1,0 +1,28 @@
+const express = require('express');
+const { Pool } = require('pg');
+
+const app = express();
+const port = process.env.PORT || 3000;
+
+// Conectar ao PostgreSQL
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+});
+
+// Rota principal
+app.get('/', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT NOW()');
+    res.send(`
+      <h1>✅ Site funcionando!</h1>
+      <p>Conectado ao PostgreSQL em: ${result.rows[0].now}</p>
+    `);
+  } catch (err) {
+    res.send(`<h1>❌ Erro no banco</h1><p>${err.message}</p>`);
+  }
+});
+
+app.listen(port, () => {
+  console.log(`🚀 Servidor rodando na porta ${port}`);
+});

@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
+const path = require('path');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -17,7 +18,6 @@ const pool = new Pool({
   port: process.env.DB_PORT,
 });
 
-// Testar conexão
 pool.connect((err, client, release) => {
   if (err) {
     console.error('❌ Erro ao conectar:', err.stack);
@@ -27,7 +27,7 @@ pool.connect((err, client, release) => {
   }
 });
 
-// ROTAS
+// ROTAS DA API
 app.get('/api/usuarios', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM usuarios ORDER BY id');
@@ -83,6 +83,16 @@ app.delete('/api/usuarios/:id', async (req, res) => {
     res.status(500).json({ error: 'Erro ao deletar usuário' });
   }
 });
+
+// =====================================================
+// ROTA PARA SERVIR O INDEX.HTML (ADICIONADO)
+// =====================================================
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// SERVIR ARQUIVOS ESTÁTICOS (CSS, JS, imagens)
+app.use(express.static(__dirname));
 
 app.listen(port, () => {
   console.log(`🚀 Servidor em http://localhost:${port}`);
