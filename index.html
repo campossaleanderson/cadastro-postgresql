@@ -3,649 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DataCad · Sistema de Cadastro</title>
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>DataCad - Sistema de cadastro</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-        }
-
-        body {
-            background: #f0f4fa;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            padding: 2rem 1rem;
-        }
-
-        .container {
-            max-width: 1300px;
-            width: 100%;
-            background: white;
-            border-radius: 2rem;
-            padding: 2rem 2rem 2.5rem;
-            box-shadow: 0 20px 40px -12px rgba(0, 20, 40, 0.2);
-        }
-
-        .header {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2.5rem;
-        }
-
-        .header-left h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            background: linear-gradient(145deg, #0b1e3a, #2a4b7a);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .header-left .subtitle {
-            color: #4a5b7a;
-            font-weight: 500;
-            font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 0.2rem;
-        }
-
-        .header-left .subtitle i {
-            color: #2a6df4;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .badge-total {
-            background: #eef3ff;
-            padding: 0.5rem 1.2rem;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: #1d3b6e;
-            border: 1px solid #d0dfff;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .badge-total i {
-            color: #2a6df4;
-        }
-
-        .date-chip {
-            background: white;
-            padding: 0.5rem 1.2rem;
-            border-radius: 40px;
-            font-weight: 500;
-            font-size: 0.9rem;
-            color: #1f2a44;
-            border: 1px solid #e2eaf9;
-        }
-
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 1.8fr;
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .form-card {
-            background: #f9fcff;
-            border-radius: 1.5rem;
-            padding: 1.8rem 1.8rem 2rem;
-            border: 1px solid #eaf0fa;
-        }
-
-        .form-card h2 {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #0b1e3a;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-        }
-
-        .form-card h2 i {
-            color: #2a6df4;
-        }
-
-        .form-group {
-            margin-bottom: 1.2rem;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #2d4066;
-            margin-bottom: 0.3rem;
-        }
-
-        .form-group label i {
-            color: #2a6df4;
-            width: 1.2rem;
-        }
-
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 0.7rem 1rem;
-            border: 1.5px solid #dce5f2;
-            border-radius: 0.8rem;
-            font-size: 0.95rem;
-            background: white;
-            transition: 0.15s;
-            color: #0b1e3a;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #2a6df4;
-            box-shadow: 0 0 0 3px rgba(42, 109, 244, 0.1);
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .btn-submit {
-            width: 100%;
-            padding: 0.8rem;
-            background: linear-gradient(145deg, #1d3b6e, #2a6df4);
-            color: white;
-            border: none;
-            border-radius: 0.8rem;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: 0.15s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.6rem;
-            margin-top: 0.5rem;
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(42, 109, 244, 0.25);
-        }
-
-        .btn-submit i {
-            font-size: 0.9rem;
-        }
-
-        .table-card {
-            background: #f9fcff;
-            border-radius: 1.5rem;
-            padding: 1.5rem 1.5rem 1.2rem;
-            border: 1px solid #eaf0fa;
-        }
-
-        .table-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.2rem;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        .table-header h2 {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #0b1e3a;
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-        }
-
-        .table-header h2 i {
-            color: #2a6df4;
-        }
-
-        .table-header .search-box {
-            display: flex;
-            align-items: center;
-            background: white;
-            border: 1.5px solid #dce5f2;
-            border-radius: 2rem;
-            padding: 0.3rem 1rem;
-        }
-
-        .table-header .search-box i {
-            color: #8a9bb8;
-        }
-
-        .table-header .search-box input {
-            border: none;
-            padding: 0.4rem 0.6rem;
-            font-size: 0.85rem;
-            width: 150px;
-            background: transparent;
-            outline: none;
-        }
-
-        .table-wrapper {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
-
-        th {
-            text-align: left;
-            padding: 0.7rem 0.3rem 0.7rem 0;
-            font-weight: 600;
-            color: #2d4066;
-            border-bottom: 2px solid #dce5f2;
-            letter-spacing: 0.02em;
-        }
-
-        td {
-            padding: 0.7rem 0.3rem 0.7rem 0;
-            border-bottom: 1px solid #ecf1fa;
-            color: #14273e;
-            font-weight: 500;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        .status-badge {
-            background: #dff0ff;
-            color: #1657c8;
-            font-weight: 600;
-            font-size: 0.7rem;
-            padding: 0.2rem 0.7rem;
-            border-radius: 40px;
-            display: inline-block;
-        }
-
-        .status-badge.ativo {
-            background: #e1f7e8;
-            color: #0a6e3a;
-        }
-
-        .status-badge.inativo {
-            background: #ffe2e2;
-            color: #b13e3e;
-        }
-
-        .status-badge.pendente {
-            background: #fff3d6;
-            color: #a67c1a;
-        }
-
-        .btn-acao {
-            background: none;
-            border: none;
-            color: #4a5b7a;
-            cursor: pointer;
-            padding: 0.2rem 0.4rem;
-            border-radius: 0.3rem;
-            transition: 0.1s;
-            font-size: 0.9rem;
-        }
-
-        .btn-acao:hover {
-            background: #eaf0fa;
-            color: #1d3b6e;
-        }
-
-        .btn-acao.danger:hover {
-            background: #ffe2e2;
-            color: #b13e3e;
-        }
-
-        .footer-meta {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            border-top: 1px solid #e2eaf9;
-            padding-top: 1.8rem;
-            margin-top: 0.5rem;
-            color: #4a5d7e;
-            font-size: 0.85rem;
-        }
-
-        .footer-meta i {
-            color: #2a6df4;
-            margin-right: 0.3rem;
-        }
-
-        .footer-meta .data-refresh {
-            background: #f0f5ff;
-            padding: 0.3rem 1rem;
-            border-radius: 40px;
-        }
-
-        @media (max-width: 950px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 500px) {
-            .container {
-                padding: 1.2rem;
-            }
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-            .table-header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .table-header .search-box input {
-                width: 100%;
-            }
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background: #f0f2f5; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; margin-bottom: 10px; color: #333; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
+        .form { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 10px; margin-bottom: 30px; }
+        .form input, .form select { padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        .form button { padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .form button:hover { background: #45a049; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f8f9fa; }
+        .actions { display: flex; gap: 5px; }
+        .edit { background: #ffc107; color: black; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; }
+        .delete { background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; }
+        .empty { text-align: center; color: #999; padding: 20px; }
+        .status-badge { padding: 3px 10px; border-radius: 12px; font-size: 12px; }
+        .status-Ativo { background: #d4edda; color: #155724; }
+        .status-Inativo { background: #f8d7da; color: #721c24; }
+        .status-Pendente { background: #fff3cd; color: #856404; }
+        .stats { margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #666; font-size: 14px; }
+        .error { color: #dc3545; padding: 10px; text-align: center; }
     </style>
 </head>
 <body>
-<div class="container">
-
-    <div class="header">
-        <div class="header-left">
-            <h1><i class="fas fa-user-plus" style="color: #2a6df4; background: none; -webkit-text-fill-color: #2a6df4; margin-right: 0.3rem;"></i> DataCad</h1>
-            <div class="subtitle">
-                <i class="fas fa-address-card"></i> Sistema de cadastro de usuários
-            </div>
-        </div>
-        <div class="header-right">
-            <span class="badge-total"><i class="fas fa-users"></i> Total: <span id="totalUsuarios">0</span></span>
-            <span class="date-chip"><i class="far fa-calendar-alt"></i> Jul 2026</span>
-        </div>
-    </div>
-
-    <div class="main-grid">
-        <div class="form-card">
-            <h2><i class="fas fa-pen"></i> Novo cadastro</h2>
-            <form id="formCadastro">
-                <div class="form-group">
-                    <label><i class="fas fa-user"></i> Nome completo</label>
-                    <input type="text" id="nome" placeholder="Ex: João Silva" required>
-                </div>
-                <div class="form-group">
-                    <label><i class="fas fa-envelope"></i> E-mail</label>
-                    <input type="email" id="email" placeholder="exemplo@email.com" required>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label><i class="fas fa-phone"></i> Telefone</label>
-                        <input type="text" id="telefone" placeholder="(11) 99999-9999">
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-tag"></i> Status</label>
-                        <select id="status">
-                            <option value="Ativo">Ativo</option>
-                            <option value="Inativo">Inativo</option>
-                            <option value="Pendente">Pendente</option>
-                        </select>
-                    </div>
-                </div>
-                <button type="submit" class="btn-submit">
-                    <i class="fas fa-save"></i> Cadastrar
-                </button>
-            </form>
+    <div class="container">
+        <h1>📋 DataCad</h1>
+        <p class="subtitle">Sistema de cadastro de usuários</p>
+        
+        <div class="form">
+            <input type="text" id="nome" placeholder="Nome completo" required>
+            <input type="email" id="email" placeholder="E-mail" required>
+            <input type="text" id="telefone" placeholder="Telefone">
+            <select id="status">
+                <option value="Ativo">Ativo</option>
+                <option value="Inativo">Inativo</option>
+                <option value="Pendente">Pendente</option>
+            </select>
+            <button onclick="salvarUsuario()">Cadastrar</button>
         </div>
 
-        <div class="table-card">
-            <div class="table-header">
-                <h2><i class="fas fa-list"></i> Usuários cadastrados</h2>
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="searchInput" placeholder="Filtrar...">
-                </div>
-            </div>
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nome</th>
-                            <th>E-mail</th>
-                            <th>Status</th>
-                            <th style="text-align:center;">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabelaUsuarios">
-                        <tr><td colspan="4" style="text-align:center; padding:2rem 0; color:#8a9bb8;">Carregando usuários...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+        <div id="mensagem" style="display:none; padding:10px; margin-bottom:10px; border-radius:5px;"></div>
 
-    <div class="footer-meta">
-        <div>
-            <i class="fas fa-database"></i> Dados em PostgreSQL · <span id="qtdeRegistros">0</span> registros
-        </div>
-        <div class="data-refresh">
-            <i class="fas fa-sync-alt"></i> atualização automática
-        </div>
-        <div>
-            <i class="fas fa-shield-alt"></i> dados persistidos
-        </div>
-    </div>
-</div>
-
-<script>
-    // ============ CONFIGURAÇÃO DA API ============
-    const API_URL = 'http://localhost:3000/api/usuarios';
-
-    // ============ ELEMENTOS DOM ============
-    const form = document.getElementById('formCadastro');
-    const nomeInput = document.getElementById('nome');
-    const emailInput = document.getElementById('email');
-    const telefoneInput = document.getElementById('telefone');
-    const statusSelect = document.getElementById('status');
-    const tbody = document.getElementById('tabelaUsuarios');
-    const totalSpan = document.getElementById('totalUsuarios');
-    const qtdeSpan = document.getElementById('qtdeRegistros');
-    const searchInput = document.getElementById('searchInput');
-
-    let usuarios = [];
-    let editandoId = null;
-
-    // ============ FUNÇÕES ============
-
-    async function carregarUsuarios() {
-        try {
-            const response = await fetch(API_URL);
-            if (!response.ok) throw new Error('Erro ao carregar dados');
-            usuarios = await response.json();
-            renderizarTabela(searchInput.value);
-        } catch (error) {
-            console.error('Erro:', error);
-            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:2rem 0; color:#e74c3c;">❌ Erro ao carregar usuários. Verifique se o servidor está rodando.</td></tr>`;
-        }
-    }
-
-    function renderizarTabela(filtro = '') {
-        const filtroLower = filtro.toLowerCase().trim();
-        let filtrados = usuarios;
-
-        if (filtroLower !== '') {
-            filtrados = usuarios.filter(u =>
-                u.nome.toLowerCase().includes(filtroLower) ||
-                u.email.toLowerCase().includes(filtroLower) ||
-                u.status.toLowerCase().includes(filtroLower)
-            );
-        }
-
-        if (filtrados.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:2rem 0; color:#8a9bb8;">Nenhum usuário encontrado</td></tr>`;
-        } else {
-            tbody.innerHTML = filtrados.map(u => `
+        <table>
+            <thead>
                 <tr>
-                    <td><i class="fas fa-user-circle" style="color:#2a6df4; margin-right:6px;"></i>${u.nome}</td>
-                    <td>${u.email}</td>
-                    <td><span class="status-badge ${u.status.toLowerCase()}">${u.status}</span></td>
-                    <td style="text-align:center;">
-                        <button class="btn-acao" onclick="editarUsuario(${u.id})" title="Editar"><i class="fas fa-edit"></i></button>
-                        <button class="btn-acao danger" onclick="excluirUsuario(${u.id})" title="Excluir"><i class="fas fa-trash-alt"></i></button>
-                    </td>
+                    <th>Nome</th>
+                    <th>E-mail</th>
+                    <th>Status</th>
+                    <th>Ações</th>
                 </tr>
-            `).join('');
+            </thead>
+            <tbody id="listaUsuarios">
+                <tr><td colspan="4" class="empty">Carregando...</td></tr>
+            </tbody>
+        </table>
+
+        <div class="stats">
+            <span>Dados em PostgreSQL · <span id="totalRegistros">0</span> registros</span>
+            <span style="margin-left:20px;">atualização automática</span>
+            <span style="margin-left:20px;">dados persistidos</span>
+        </div>
+    </div>
+
+    <script>
+        let editandoId = null;
+
+        async function carregarUsuarios() {
+            try {
+                const response = await fetch('/api/usuarios');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const usuarios = await response.json();
+                const tbody = document.getElementById('listaUsuarios');
+                const total = document.getElementById('totalRegistros');
+                
+                total.textContent = usuarios.length;
+
+                if (usuarios.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="empty">Nenhum usuário cadastrado</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = usuarios.map(u => `
+                    <tr>
+                        <td><strong>${u.nome}</strong></td>
+                        <td>${u.email}</td>
+                        <td><span class="status-badge status-${u.status}">${u.status}</span></td>
+                        <td class="actions">
+                            <button class="edit" onclick="editarUsuario(${u.id})">✏️</button>
+                            <button class="delete" onclick="deletarUsuario(${u.id})">🗑️</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Erro ao carregar usuários:', error);
+                document.getElementById('listaUsuarios').innerHTML = '<tr><td colspan="4" class="error">❌ Erro ao carregar usuários. Verifique se o servidor está rodando.</td></tr>';
+            }
         }
 
-        totalSpan.textContent = usuarios.length;
-        qtdeSpan.textContent = usuarios.length;
-    }
+        async function salvarUsuario() {
+            const nome = document.getElementById('nome').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const telefone = document.getElementById('telefone').value.trim();
+            const status = document.getElementById('status').value;
 
-    async function adicionarUsuario(nome, email, telefone, status) {
-        try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nome, email, telefone, status })
-            });
-
-            if (!response.ok) throw new Error('Erro ao cadastrar');
-            const novo = await response.json();
-            usuarios.push(novo);
-            renderizarTabela(searchInput.value);
-            return novo;
-        } catch (error) {
-            console.error('Erro:', error);
-            alert('Erro ao cadastrar usuário. Verifique se o email já existe.');
-            throw error;
-        }
-    }
-
-    async function atualizarUsuario(id, nome, email, telefone, status) {
-        try {
-            const response = await fetch(`${API_URL}/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nome, email, telefone, status })
-            });
-
-            if (!response.ok) throw new Error('Erro ao atualizar');
-            const atualizado = await response.json();
-            
-            const index = usuarios.findIndex(u => u.id === id);
-            if (index !== -1) usuarios[index] = atualizado;
-            
-            renderizarTabela(searchInput.value);
-            return atualizado;
-        } catch (error) {
-            console.error('Erro:', error);
-            alert('Erro ao atualizar usuário. Verifique se o email já existe.');
-            throw error;
-        }
-    }
-
-    window.excluirUsuario = async function(id) {
-        if (!confirm('Tem certeza que deseja excluir este usuário?')) return;
-        
-        try {
-            const response = await fetch(`${API_URL}/${id}`, {
-                method: 'DELETE'
-            });
-
-            if (!response.ok) throw new Error('Erro ao excluir');
-            
-            usuarios = usuarios.filter(u => u.id !== id);
-            renderizarTabela(searchInput.value);
-        } catch (error) {
-            console.error('Erro:', error);
-            alert('Erro ao excluir usuário');
-        }
-    };
-
-    window.editarUsuario = function(id) {
-        const usuario = usuarios.find(u => u.id === id);
-        if (!usuario) return;
-
-        nomeInput.value = usuario.nome;
-        emailInput.value = usuario.email;
-        telefoneInput.value = usuario.telefone || '';
-        statusSelect.value = usuario.status;
-
-        const btn = form.querySelector('.btn-submit');
-        btn.innerHTML = '<i class="fas fa-sync-alt"></i> Atualizar';
-        editandoId = id;
-        
-        document.querySelector('.form-card').scrollIntoView({ behavior: 'smooth' });
-    };
-
-    // ============ EVENTOS ============
-
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault();
-
-        const nome = nomeInput.value.trim();
-        const email = emailInput.value.trim();
-        const telefone = telefoneInput.value.trim();
-        const status = statusSelect.value;
-
-        if (!nome || !email) {
-            alert('Por favor, preencha nome e e-mail.');
-            return;
-        }
-
-        try {
-            if (editandoId) {
-                await atualizarUsuario(editandoId, nome, email, telefone, status);
-                editandoId = null;
-                const btn = form.querySelector('.btn-submit');
-                btn.innerHTML = '<i class="fas fa-save"></i> Cadastrar';
-            } else {
-                await adicionarUsuario(nome, email, telefone, status);
+            if (!nome || !email) {
+                mostrarMensagem('Nome e email são obrigatórios!', 'error');
+                return;
             }
 
-            nomeInput.value = '';
-            emailInput.value = '';
-            telefoneInput.value = '';
+            const usuario = { nome, email, telefone: telefone || null, status };
 
-        } catch (error) {
-            console.error('Erro no submit:', error);
+            try {
+                let response;
+                if (editandoId) {
+                    response = await fetch(`/api/usuarios/${editandoId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(usuario)
+                    });
+                } else {
+                    response = await fetch('/api/usuarios', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(usuario)
+                    });
+                }
+
+                if (response.ok) {
+                    document.getElementById('nome').value = '';
+                    document.getElementById('email').value = '';
+                    document.getElementById('telefone').value = '';
+                    document.getElementById('status').value = 'Ativo';
+                    editandoId = null;
+                    mostrarMensagem(editandoId ? 'Usuário atualizado com sucesso!' : 'Usuário cadastrado com sucesso!', 'success');
+                    carregarUsuarios();
+                } else {
+                    const error = await response.json();
+                    mostrarMensagem('Erro: ' + (error.error || 'Erro ao salvar'), 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                mostrarMensagem('Erro ao salvar usuário', 'error');
+            }
         }
-    });
 
-    searchInput.addEventListener('input', function() {
-        renderizarTabela(this.value);
-    });
+        async function editarUsuario(id) {
+            try {
+                const response = await fetch('/api/usuarios');
+                const usuarios = await response.json();
+                const usuario = usuarios.find(u => u.id === id);
+                
+                if (usuario) {
+                    document.getElementById('nome').value = usuario.nome;
+                    document.getElementById('email').value = usuario.email;
+                    document.getElementById('telefone').value = usuario.telefone || '';
+                    document.getElementById('status').value = usuario.status || 'Ativo';
+                    editandoId = id;
+                    document.querySelector('.form button').textContent = 'Atualizar';
+                    mostrarMensagem('Editando: ' + usuario.nome, 'info');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                mostrarMensagem('Erro ao carregar dados para edição', 'error');
+            }
+        }
 
-    // ============ INICIALIZAÇÃO ============
-    carregarUsuarios();
+        async function deletarUsuario(id) {
+            if (!confirm('Tem certeza que deseja deletar este usuário?')) return;
 
-    console.log('🚀 DataCad conectado ao PostgreSQL!');
-    console.log(`📊 API rodando em: ${API_URL}`);
-</script>
+            try {
+                const response = await fetch(`/api/usuarios/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    mostrarMensagem('Usuário deletado com sucesso!', 'success');
+                    carregarUsuarios();
+                } else {
+                    mostrarMensagem('Erro ao deletar usuário', 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                mostrarMensagem('Erro ao deletar usuário', 'error');
+            }
+        }
 
+        function mostrarMensagem(texto, tipo) {
+            const div = document.getElementById('mensagem');
+            div.textContent = texto;
+            div.style.display = 'block';
+            div.style.background = tipo === 'error' ? '#f8d7da' : tipo === 'success' ? '#d4edda' : '#fff3cd';
+            div.style.color = tipo === 'error' ? '#721c24' : tipo === 'success' ? '#155724' : '#856404';
+            setTimeout(() => { div.style.display = 'none'; }, 4000);
+        }
+
+        // Carregar usuários ao iniciar
+        carregarUsuarios();
+    </script>
 </body>
 </html>
