@@ -44,7 +44,6 @@
             font-size: 14px; 
         }
         
-        /* FORMULÁRIO - Responsivo */
         .form { 
             display: grid; 
             grid-template-columns: 1fr; 
@@ -77,15 +76,6 @@
             background: #45a049; 
         }
         
-        .form button.btn-atualizar {
-            background: #17a2b8;
-        }
-        
-        .form button.btn-atualizar:hover {
-            background: #138496;
-        }
-        
-        /* TABELA - Responsiva */
         .table-responsive {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
@@ -204,7 +194,15 @@
             text-align: center;
         }
         
-        /* RESPONSIVO - TELAS PEQUENAS */
+        .badge-versao {
+            background: #6c757d;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            margin-left: 5px;
+        }
+        
         @media (max-width: 600px) {
             body { padding: 5px; }
             .container { padding: 10px; }
@@ -264,7 +262,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>📋 DataCad</h1>
+        <h1>📋 DataCad <span class="badge-versao" id="versaoLabel">v2.0</span></h1>
         <p class="subtitle">Sistema de cadastro de usuários</p>
         
         <div class="form">
@@ -309,30 +307,40 @@
     </div>
 
     <script>
+        // =============================================
         // VERSÃO DO SISTEMA - MUDE QUANDO ALTERAR O CÓDIGO
-        const VERSAO = '1.0.3';
+        const VERSAO = '2.0';
+        // =============================================
+        
         console.log('📌 DataCad Versão:', VERSAO);
         console.log('🔄 Carregando dados...');
+        
+        document.getElementById('versaoLabel').textContent = 'v' + VERSAO;
 
         let editandoId = null;
+        let ultimaAtualizacao = 0;
 
         // FUNÇÃO PRINCIPAL: CARREGAR USUÁRIOS
         async function carregarUsuarios() {
-            console.log('🔄 Buscando usuários...');
+            console.log('🔄 Buscando usuários... (versão ' + VERSAO + ')');
+            
             try {
-                const resposta = await fetch('/api/usuarios');
+                // Adicionar timestamp para evitar cache
+                const timestamp = Date.now();
+                const resposta = await fetch('/api/usuarios?_=' + timestamp);
                 
                 if (!resposta.ok) {
                     throw new Error(`Erro HTTP! status: ${resposta.status}`);
                 }
                 
                 const usuarios = await resposta.json();
-                console.log('📥 Usuários carregados:', usuarios.length);
+                console.log('📥 Usuários carregados:', usuarios.length, 'às', new Date().toLocaleTimeString());
                 
                 const tbody = document.getElementById('listaUsuarios');
                 const total = document.getElementById('totalRegistros');
                 
                 total.textContent = usuarios.length;
+                ultimaAtualizacao = timestamp;
 
                 if (usuarios.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="4" class="empty">Nenhum usuário cadastrado</td></tr>';
@@ -356,7 +364,7 @@
                 console.log('✅ Lista atualizada com sucesso!');
             } catch (erro) {
                 console.error('❌ Erro ao carregar usuários:', erro);
-                document.getElementById('listaUsuarios').innerHTML = '<tr><td colspan="4" class="error">❌ Erro ao carregar usuários. Verifique sua conexão.</td></tr>';
+                document.getElementById('listaUsuarios').innerHTML = '<tr><td colspan="4" class="error">❌ Erro ao carregar usuários</td></tr>';
             }
         }
 
@@ -372,12 +380,7 @@
                 return;
             }
 
-            const usuario = { 
-                nome, 
-                email, 
-                telefone: telefone || null, 
-                status 
-            };
+            const usuario = { nome, email, telefone: telefone || null, status };
 
             console.log('💾 Salvando usuário:', usuario);
 
@@ -402,25 +405,23 @@
                 }
 
                 if (resposta.ok) {
-                    // Limpar campos
                     document.getElementById('nome').value = '';
                     document.getElementById('email').value = '';
                     document.getElementById('telefone').value = '';
                     document.getElementById('status').value = 'Ativo';
                     
-                    const mensagem = editandoId ? '✅ Usuário atualizado com sucesso!' : '✅ Usuário cadastrado com sucesso!';
-                    mostrarMensagem(mensagem, 'success');
+                    mostrarMensagem(editandoId ? '✅ Atualizado!' : '✅ Cadastrado!', 'success');
                     
                     editandoId = null;
                     document.getElementById('btnSalvar').textContent = 'Cadastrar';
                     
-                    // 🔥 RECARREGAR A LISTA IMEDIATAMENTE
+                    // RECARREGAR A LISTA
                     await carregarUsuarios();
                     
-                    // 👇 FORÇAR ATUALIZAÇÃO NO MOBILE (recarrega a página)
+                    // FORÇAR RECARREGAR A PÁGINA APÓS 1 SEGUNDO
                     setTimeout(() => {
-                        window.location.reload();
-                    }, 500);
+                        window.location.reload(true); // true = força recarregar do servidor
+                    }, 800);
                     
                 } else {
                     const erro = await resposta.json();
@@ -428,7 +429,7 @@
                 }
             } catch (erro) {
                 console.error('❌ Erro na requisição:', erro);
-                mostrarMensagem('❌ Erro ao salvar usuário. Verifique sua conexão.', 'error');
+                mostrarMensagem('❌ Erro ao salvar', 'error');
             } finally {
                 btn.textContent = editandoId ? 'Atualizar' : 'Cadastrar';
                 btn.disabled = false;
@@ -451,38 +452,34 @@
                     editandoId = id;
                     document.getElementById('btnSalvar').textContent = 'Atualizar';
                     mostrarMensagem('✏️ Editando: ' + usuario.nome, 'info');
-                    // Rolar para o topo
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
             } catch (erro) {
                 console.error('❌ Erro ao editar:', erro);
-                mostrarMensagem('❌ Erro ao carregar dados para edição', 'error');
+                mostrarMensagem('❌ Erro ao carregar para edição', 'error');
             }
         }
 
         // FUNÇÃO PARA DELETAR
         async function deletarUsuario(id) {
-            if (!confirm('🗑️ Tem certeza que deseja deletar este usuário?')) return;
+            if (!confirm('🗑️ Tem certeza?')) return;
 
             console.log('🗑️ Deletando usuário ID:', id);
             try {
-                const resposta = await fetch(`/api/usuarios/${id}`, { 
-                    method: 'DELETE' 
-                });
+                const resposta = await fetch(`/api/usuarios/${id}`, { method: 'DELETE' });
                 
                 if (resposta.ok) {
-                    mostrarMensagem('✅ Usuário deletado com sucesso!', 'success');
+                    mostrarMensagem('✅ Deletado!', 'success');
                     await carregarUsuarios();
-                    // Forçar atualização no mobile
                     setTimeout(() => {
-                        window.location.reload();
-                    }, 300);
+                        window.location.reload(true);
+                    }, 500);
                 } else {
-                    mostrarMensagem('❌ Erro ao deletar usuário', 'error');
+                    mostrarMensagem('❌ Erro ao deletar', 'error');
                 }
             } catch (erro) {
                 console.error('❌ Erro ao deletar:', erro);
-                mostrarMensagem('❌ Erro ao deletar usuário', 'error');
+                mostrarMensagem('❌ Erro ao deletar', 'error');
             }
         }
 
@@ -502,14 +499,13 @@
             div.style.background = cor.bg;
             div.style.color = cor.color;
             
-            // Esconder após 5 segundos
             clearTimeout(window.timerMensagem);
             window.timerMensagem = setTimeout(() => {
                 div.style.display = 'none';
             }, 5000);
         }
 
-        // FUNÇÃO PARA ESCAPAR HTML (evitar injeção)
+        // FUNÇÃO PARA ESCAPAR HTML
         function escapeHtml(texto) {
             if (!texto) return '';
             const mapa = {
@@ -524,14 +520,14 @@
 
         // CARREGAR USUÁRIOS AO INICIAR
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('📱 Aplicação iniciada!');
+            console.log('📱 Aplicação iniciada! Versão:', VERSAO);
             carregarUsuarios();
             
-            // Recarregar a cada 30 segundos (para manter atualizado)
+            // Auto-refresh a cada 15 segundos (mais rápido)
             setInterval(() => {
                 console.log('🔄 Auto-refresh...');
                 carregarUsuarios();
-            }, 30000);
+            }, 15000);
         });
     </script>
 </body>
